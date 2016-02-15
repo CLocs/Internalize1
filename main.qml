@@ -1,6 +1,8 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
+import QtQuick.Layouts 1.2
+import colin.das.Internalize 1.0
 
 ApplicationWindow {
     visible: true
@@ -22,11 +24,35 @@ ApplicationWindow {
         }
     }
 
-    MainForm {
+    SplitView {
         anchors.fill: parent
-        button1.onClicked: messageDialog.show(qsTr("Button 1 pressed"))
-        button2.onClicked: messageDialog.show(qsTr("Button 2 pressed"))
+
+        ColumnLayout {
+            ListView {
+                Layout.fillHeight: true
+                model: NoteDatabase.model
+                delegate: Text { text: model.title }
+            }
+
+            Button {
+                text: "Add Note"
+                onClicked: NoteDatabase.addNote();
+            }
+        }
+
+        ListView {
+            model: NoteDatabase.model
+            delegate: Note {
+                title: model.title
+                content: model.content
+
+                onTitleChanged:  NoteDatabase.model.setTitle(index, title)
+                onContentChanged:  NoteDatabase.model.setTitle(index, content)
+            }
+        }
+
     }
+
 
     MessageDialog {
         id: messageDialog
