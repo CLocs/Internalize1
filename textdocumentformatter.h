@@ -16,7 +16,7 @@ public:
     void setTextDocument(QQuickTextDocument *value);
 
 signals:
-    textDocumentChanged();
+    void textDocumentChanged();
 
 public slots:
     void setBold(int start, int end);
