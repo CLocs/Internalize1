@@ -17,7 +17,7 @@ NoteDatabase::NoteDatabase()
         db.open();
     }
 
-    auto error = db.exec("CREATE TABLE IF NOT EXISTS notes (id int primary key, title TEXT, content TEXT)").lastError();
+    auto error = db.exec("CREATE TABLE IF NOT EXISTS notes (id integer primary key, title TEXT, content TEXT)").lastError();
 
     m_notesTableModel = new NotesModel(db,this);
     m_notesTableModel->select();
