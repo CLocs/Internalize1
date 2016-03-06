@@ -3,6 +3,5 @@
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
         <file>Note.qml</file>
-        <file>NoteForm.ui.qml</file>
     </qresource>
 </RCC>
