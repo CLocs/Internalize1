@@ -42,7 +42,6 @@ Item {
         anchors.leftMargin: 6
         anchors.bottomMargin: 6
 
-        onEditingFinished: textChanged()
         textFormat: TextEdit.RichText
 
         menu: Menu {
