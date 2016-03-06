@@ -5,7 +5,7 @@ import colin.das.Internalize 1.0
 Item {
     id: item1
     width: 400
-    height: 400
+    height: titleArea.height + textArea.contentHeight + titleArea.anchors.topMargin + textArea.anchors.topMargin + textArea.anchors.bottomMargin + border.border.width * 2
 
     Rectangle {
         id: border
@@ -15,6 +15,20 @@ Item {
         z: -1
         border.width: 2
     }
+
+    TextInput {
+        id: titleArea
+        height: 20
+        text: qsTr("Text Input")
+        anchors.right: parent.right
+        anchors.rightMargin: 6
+        anchors.left: parent.left
+        anchors.leftMargin: 6
+        anchors.top: parent.top
+        anchors.topMargin: 6
+        font.pixelSize: 12
+    }
+    property alias title: titleArea.text
 
     TextArea {
         id: textArea
@@ -38,21 +52,7 @@ Item {
         }
     }
 
-    TextInput {
-        id: titleArea
-        height: 20
-        text: qsTr("Text Input")
-        anchors.right: parent.right
-        anchors.rightMargin: 6
-        anchors.left: parent.left
-        anchors.leftMargin: 6
-        anchors.top: parent.top
-        anchors.topMargin: 6
-        font.pixelSize: 12
-    }
-
     property alias content: textArea.text
-    property alias title: titleArea.text
 
     Action {
         id: boldAction
