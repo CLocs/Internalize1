@@ -2,6 +2,7 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
+import QtWebView 1.1
 import colin.das.Internalize 1.0
 
 ApplicationWindow {
@@ -27,16 +28,18 @@ ApplicationWindow {
     SplitView {
         anchors.fill: parent
 
-        ColumnLayout {
-            ListView {
-                Layout.fillHeight: true
-                model: NoteDatabase.model
-                delegate: Text { text: model.title }
-            }
+        WebView {
+            id: sourceView
+            width: parent.width / 3
+           //url: "https://drive.google.com/open?id=0B3Ej2lncGdJQT1hSY0FVand3aEk"
+            // TODO: binding this URL right away shows a blank window - report race condition bug
+            Component.onCompleted: sourceView.url = "http://slatestarcodex.com/"
+        }
 
-            Button {
-                text: "Add Note"
-                onClicked: NoteDatabase.addNote();
+        ScrollView {
+            width: parent.width / 3
+            Image {
+                source: "Internalize-Demo1.svg"
             }
         }
 
@@ -51,10 +54,22 @@ ApplicationWindow {
             }
         }
 
+        ColumnLayout {
+            ListView {
+                Layout.fillHeight: true
+                model: NoteDatabase.model
+                delegate: Text { text: model.title }
+            }
+
+            Button {
+                text: "Add Note"
+                onClicked: NoteDatabase.addNote();
+            }
+        }
     }
 
 
-    MessageDialog {
+/*    MessageDialog {
         id: messageDialog
         title: qsTr("May I have your attention, please?")
 
@@ -62,5 +77,5 @@ ApplicationWindow {
             messageDialog.text = caption;
             messageDialog.open();
         }
-    }
+    }*/
 }
