@@ -4,12 +4,30 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtWebView 1.1
 import colin.das.Internalize 1.0
+import Qt.labs.settings 1.0
 
 ApplicationWindow {
     visible: true
     width: 640
     height: 480
     title: qsTr("Hello World")
+    id: window
+
+    Settings {
+        id: settings
+        category: "ApplicationWindow"
+        property int visibility: Window.Windowed
+        property alias width: window.width
+        property alias height: window.height
+    }
+
+    Component.onDestruction: {
+        if(window.visibility === Window.Maximized || window.visibility === Window.Fullscreen) {
+            settings.visibility = window.visibility
+        } else {
+            settings.visibility = Window.Windowed
+        }
+    }
 
     menuBar: MenuBar {
         Menu {

@@ -9,6 +9,8 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QtWebView::initialize();
+    app.setOrganizationName("Internalize");
+    app.setOrganizationDomain("colin.das.Internalize");
     app.setApplicationName("Internalize");
 
     QQmlApplicationEngine engine;
