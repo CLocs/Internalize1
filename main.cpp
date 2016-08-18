@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "textdocumentformatter.h"
 #include "notedatabase.h"
@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
     QtWebView::initialize();
     app.setApplicationName("Internalize");
 
