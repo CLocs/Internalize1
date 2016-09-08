@@ -28,6 +28,12 @@ ApplicationWindow {
         anchors.fill: parent
 
         ColumnLayout {
+            CheckBox {
+                id: showContentCheck
+                text: "Show Content"
+                checked: true
+            }
+
             ListView {
                 Layout.fillHeight: true
                 model: NoteDatabase.model
@@ -45,6 +51,8 @@ ApplicationWindow {
             delegate: Note {
                 title: model.title
                 content: model.content
+
+                showContent: showContentCheck.checked
 
                 onTitleChanged:  NoteDatabase.model.setTitle(index, title)
                 onContentChanged:  NoteDatabase.model.setContent(index, content)

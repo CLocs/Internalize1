@@ -5,7 +5,9 @@ import colin.das.Internalize 1.0
 Item {
     id: item1
     width: 400
-    height: titleArea.height + textArea.contentHeight + titleArea.anchors.topMargin + textArea.anchors.topMargin + textArea.anchors.bottomMargin + border.border.width * 2
+    height: titleArea.height + titleArea.anchors.topMargin + (showContent ? textArea.anchors.topMargin + textArea.contentHeight + textArea.anchors.bottomMargin : 0) + border.border.width * 2
+
+    property bool showContent: true
 
     Rectangle {
         id: border
@@ -32,6 +34,7 @@ Item {
 
     TextArea {
         id: textArea
+        visible: showContent
         text: ""
         anchors.top: titleArea.bottom
         anchors.topMargin: 6
