@@ -7,6 +7,10 @@ SOURCES += main.cpp \
     textdocumentformatter.cpp \
     notedatabase.cpp
 
+OTHER_FILES += main.qml \
+    MainForm.ui.qml \
+    Note.qml
+
 RESOURCES += qml.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
