@@ -50,7 +50,11 @@ ApplicationWindow {
                 content: model.content
 
                 onTitleChanged:  NoteDatabase.model.setTitle(index, title)
-                onContentChanged:  NoteDatabase.model.setContent(index, content)
+                onContentChanged:  {
+
+                    NoteDatabase.model.setContent(index, content)
+                    Repository.store(content);
+                }
             }
         }
 
