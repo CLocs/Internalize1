@@ -18,7 +18,7 @@ Item {
 
     TextInput {
         id: titleArea
-        height: 20
+        wrapMode: TextInput.Wrap
         text: qsTr("Text Input")
         anchors.right: parent.right
         anchors.rightMargin: 6
@@ -30,8 +30,10 @@ Item {
     }
     property alias title: titleArea.text
 
-    TextArea {
+    TextEdit {
         id: textArea
+        wrapMode: TextEdit.Wrap
+        selectByMouse: true
         text: ""
         anchors.top: titleArea.bottom
         anchors.topMargin: 6
@@ -44,7 +46,14 @@ Item {
 
         textFormat: TextEdit.RichText
 
-        menu: Menu {
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton
+            onClicked: textAreaMenu.popup()
+        }
+
+        Menu {
+            id: textAreaMenu
             MenuItem {
                 action: boldAction
             }
@@ -70,8 +79,6 @@ Item {
         shortcut: "Ctrl+S"
         onTriggered: item1.save()
     }
-
-
 
     TextDocumentFormatter {
         id: formatter
