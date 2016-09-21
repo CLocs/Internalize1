@@ -40,12 +40,15 @@ class MultiHash : public QCryptographicHash
 class Repository : public QObject
 {
     Q_OBJECT
-    QDir directory;
+
+    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
 public:
     explicit Repository(QObject *parent = 0);
     explicit Repository(QString path, QObject *parent = 0);
 
 signals:
+    void error(const QString &message);
+    void errorStringChanged();
 
 public slots:
     QByteArray store(QIODevice *content);
@@ -60,7 +63,20 @@ public slots:
 
     static QObject *singletontype_provider(QQmlEngine *engine, QJSEngine *scriptEngine);
 
+    QString errorString() const { return lastErrorString; }
+    void unsetError() {
+        lastErrorString.clear();
+        emit errorStringChanged();
+    }
+
 private:
+    void setErrorString(const QString &message) {
+        lastErrorString = message;
+        emit error(message);
+    }
+
+    QString lastErrorString;
+    QDir directory;
     MultiHash::Method hashMethod;
 };
 

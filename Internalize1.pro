@@ -6,7 +6,8 @@ CONFIG += c++11
 SOURCES += main.cpp \
     textdocumentformatter.cpp \
     notedatabase.cpp \
-    Repository.cpp
+    Repository.cpp \
+    ErrorHandler.cpp
 
 OTHER_FILES += main.qml \
     MainForm.ui.qml \
@@ -23,4 +24,5 @@ include(deployment.pri)
 HEADERS += \
     textdocumentformatter.h \
     notedatabase.h \
-    Repository.h
+    Repository.h \
+    ErrorHandler.h

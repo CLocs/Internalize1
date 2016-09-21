@@ -3,6 +3,7 @@
 #include "textdocumentformatter.h"
 #include "notedatabase.h"
 #include "Repository.h"
+#include "ErrorHandler.h"
 #include <QtQml>
 #include <QtWebView>
 
@@ -13,6 +14,9 @@ int main(int argc, char *argv[])
     app.setApplicationName("Internalize");
 
     QQmlApplicationEngine engine;
+    ErrorHandler handler;
+    qInstallMessageHandler(ErrorHandler::handleMessage);
+    QObject::connect(&engine,&QQmlApplicationEngine::warnings,&handler,&ErrorHandler::handleWarnings);
 
     qmlRegisterType<TextDocumentFormatter>("colin.das.Internalize", 1, 0, "TextDocumentFormatter");
     qmlRegisterSingletonType<NoteDatabase>("colin.das.Internalize", 1, 0, "NoteDatabase", &NoteDatabase::singletontype_provider);
@@ -24,3 +28,4 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+

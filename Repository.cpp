@@ -12,6 +12,7 @@ Repository::Repository(QString path, QObject *parent)
     , directory(path)
     , hashMethod(MultiHash::Sha1)
 {
+    connect(this,&Repository::error,this,&Repository::errorStringChanged);
     directory.mkpath(directory.path());
 }
 
@@ -21,7 +22,11 @@ QObject *Repository::singletontype_provider(QQmlEngine *engine, QJSEngine *scrip
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
-    return new Repository();
+    Repository *r = new Repository();
+    connect(r,&Repository::error,[](const QString &m) {
+        qDebug() << m;
+    });
+    return r;
 }
 
 QByteArray Repository::store(QIODevice *content)
@@ -45,10 +50,16 @@ QByteArray Repository::store(QIODevice *content)
                 // successfully written, so rename to the hash and keep it after all.
                 file.setAutoRemove(false);
                 return hash.result();
+            } else {
+                setErrorString(file.errorString());
             }
+        } else {
+            setErrorString(content->errorString());
         }
+    } else {
+        setErrorString(file.errorString());
     }
-    abort();
+    return QByteArray();
 }
 
 QIODevice *Repository::read(QByteArray multihash)
