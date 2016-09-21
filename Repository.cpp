@@ -37,7 +37,7 @@ QByteArray Repository::store(QIODevice *content)
             file.write(buffer,len);
         }
         if(content->atEnd()) {
-            QString path = directory.filePath(hash.result().toBase64());
+            QString path = directory.filePath(hash.result().toBase64(QByteArray::Base64UrlEncoding));
             if(QFile::exists(path)) {
                 /* this content is already stored? */
                 return hash.result();
