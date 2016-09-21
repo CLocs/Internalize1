@@ -49,7 +49,11 @@ Item {
                 action: boldAction
             }
         }
+
+        Component.onDestruction: item1.save();
     }
+
+    signal save()
 
     property alias content: textArea.text
 
@@ -59,6 +63,14 @@ Item {
         shortcut: "Ctrl+B"
         onTriggered: formatter.setBold(textArea.selectionStart,textArea.selectionEnd)
     }
+
+    Action {
+        id: saveAction
+        text: "Save"
+        shortcut: "Ctrl+S"
+        onTriggered: item1.save()
+    }
+
 
 
     TextDocumentFormatter {

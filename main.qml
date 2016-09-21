@@ -50,8 +50,7 @@ ApplicationWindow {
                 content: model.content
 
                 onTitleChanged:  NoteDatabase.model.setTitle(index, title)
-                onContentChanged:  {
-
+                onSave:  {
                     NoteDatabase.model.setContent(index, content)
                     Repository.store(content);
                 }
