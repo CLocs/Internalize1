@@ -70,7 +70,7 @@ Item {
         id: boldAction
         text: "Bold"
         shortcut: "Ctrl+B"
-        onTriggered: formatter.setBold(textArea.selectionStart,textArea.selectionEnd)
+        onTriggered: formatter.toggleBold(textArea.selectionStart,textArea.selectionEnd)
     }
 
     Action {
