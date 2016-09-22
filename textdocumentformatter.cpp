@@ -79,7 +79,7 @@ QVector<QTextCharFormat> TextDocumentFormatter::charFormats(const QTextCursor &c
             //case 5: ab[cde]f(g) -> false (format after cursor)
             int formatRangeEnd = formatRange.start + formatRange.length;
 
-            if( formatRange.start <= (cursor.selectionEnd() - block.position())
+            if( formatRange.start < (cursor.selectionEnd() - block.position())
               && formatRangeEnd > (cursor.selectionStart() - block.position())
 ) {
                 result.append(formatRange.format);
