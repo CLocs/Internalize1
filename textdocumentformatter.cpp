@@ -55,6 +55,30 @@ void TextDocumentFormatter::clearBold(int start, int end)
     makeCursor(start,end).mergeCharFormat(format);
 }
 
+void TextDocumentFormatter::highlightSelection(int start, int end)
+{
+    QTextCursor cursor = makeCursor(start,end);
+    cursor.beginEditBlock();
+    QTextBlock block = m_textDocument->textDocument()->findBlock(start);
+    QTextCharFormat highlightFormat;
+    highlightFormat.setBackground(QColor(Qt::yellow));
+
+    while(block.isValid() && (block.position() < end)) {
+        QVector<QTextLayout::FormatRange> formats;
+        QTextLayout::FormatRange formatRange;
+        formatRange.format = highlightFormat;
+        // start = beginning of block or inside
+        formatRange.start = std::max(start - block.position(), 0);
+        // end = inside or end of block
+        formatRange.length = std::min(end - block.position(),block.length()) - formatRange.start;
+        formats.append(formatRange);
+        block.layout()->setFormats(formats);
+        block = block.next();
+    }
+
+    cursor.endEditBlock();
+}
+
 QTextCursor TextDocumentFormatter::makeCursor(int start, int end) const
 {
     QTextCursor cursor(m_textDocument->textDocument());

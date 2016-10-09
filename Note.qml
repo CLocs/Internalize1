@@ -57,6 +57,9 @@ Item {
             MenuItem {
                 action: boldAction
             }
+            MenuItem{
+                action: highlightAction
+            }
         }
 
         Component.onDestruction: item1.save();
@@ -71,6 +74,14 @@ Item {
         text: "Bold"
         shortcut: "Ctrl+B"
         onTriggered: formatter.toggleBold(textArea.selectionStart,textArea.selectionEnd)
+    }
+
+    Action {
+        id: highlightAction
+        text: "Highlight"
+        shortcut: "Ctrl+H"
+        onTriggered: formatter.highlightSelection(textArea.selectionStart,textArea.selectionEnd);
+
     }
 
     Action {
