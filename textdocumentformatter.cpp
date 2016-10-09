@@ -4,6 +4,66 @@
 #include <QTextBlock>
 #include <QTextLayout>
 
+#include <iterator>
+namespace {
+    struct TextBlockInfo {
+        QTextBlock block;
+        int start;
+        int end;
+        int length() { return end - start; }
+    };
+
+    class TextBlockIteratorEnd { };
+
+    class TextBlockIterator
+      : public std::iterator<std::input_iterator_tag,TextBlockInfo>,
+        private TextBlockInfo
+    {
+        int docStart;
+        int docEnd;
+
+        void init (const QTextBlock &block) {
+            this->block = block;
+            start = std::max(docStart - block.position(), 0);
+            end = std::min(docEnd - block.position(),block.length());
+        }
+    public:
+        TextBlockIterator(const QTextCursor &cursor)
+          : docStart(cursor.selectionStart())
+          , docEnd(cursor.selectionEnd()) {
+            if(cursor.hasComplexSelection()) {
+                abort(); // table cells and such, ?
+            } else {
+                init(cursor.document()->findBlock(docStart));
+            }
+        }
+
+        TextBlockIterator &operator++() {
+            init(block.next());
+            return *this;
+        }
+        TextBlockIterator operator++(int) {
+            TextBlockIterator r = *this;
+            operator++();
+            return r;
+        }
+        TextBlockInfo &operator *() { return *this; }
+        TextBlockInfo *operator ->() { return this; }
+        bool operator==(const TextBlockIterator&other) { return block == other.block; }
+        template<typename T> bool operator !=(T && other) { return !(*this == other); }
+
+        friend bool operator==(const TextBlockIterator &itr, const TextBlockIteratorEnd&) {
+            return !itr.block.isValid() || itr.block.position() >= itr.docEnd;
+        }
+    };
+
+    struct TextBlockRange {
+        TextBlockIterator range;
+        TextBlockIterator begin() { return range; }
+        TextBlockIteratorEnd end() {return {}; }
+    } asTextBlocks(const QTextCursor &cursor) { return {cursor}; }
+}
+
 TextDocumentFormatter::TextDocumentFormatter()
     : m_textDocument(nullptr)
 {
@@ -59,21 +119,15 @@ void TextDocumentFormatter::highlightSelection(int start, int end)
 {
     QTextCursor cursor = makeCursor(start,end);
     cursor.beginEditBlock();
-    QTextBlock block = m_textDocument->textDocument()->findBlock(start);
     QTextCharFormat highlightFormat;
     highlightFormat.setBackground(QColor(Qt::yellow));
 
-    while(block.isValid() && (block.position() < end)) {
-        QVector<QTextLayout::FormatRange> formats;
+    for(auto &&i: asTextBlocks(cursor)) {
         QTextLayout::FormatRange formatRange;
         formatRange.format = highlightFormat;
-        // start = beginning of block or inside
-        formatRange.start = std::max(start - block.position(), 0);
-        // end = inside or end of block
-        formatRange.length = std::min(end - block.position(),block.length()) - formatRange.start;
-        formats.append(formatRange);
-        block.layout()->setFormats(formats);
-        block = block.next();
+        formatRange.length = i.length();
+        formatRange.start = i.start;
+        i.block.layout()->setFormats({formatRange});
     }
 
     cursor.endEditBlock();
@@ -89,24 +143,21 @@ QTextCursor TextDocumentFormatter::makeCursor(int start, int end) const
 
 QVector<QTextCharFormat> TextDocumentFormatter::charFormats(const QTextCursor &cursor)
 {
-    if(cursor.hasComplexSelection()) {
-        abort(); // table cells and such, ?
-    } else if(cursor.hasSelection()) {
+    if(cursor.hasSelection()) {
         QVector<QTextCharFormat> result;
-        const QTextBlock &block = cursor.block();
-        for(QTextLayout::FormatRange formatRange: block.textFormats()) {
-            // ab[cd]ef
-            //case 1: (a)b[cde]fg -> false (format before cursor)
-            //case 2: a(b[c)de]fg -> true (format overlaps start of cursor
-            //case 3: ab[c(d)e]fg -> true (format completely inside cursor)
-            //case 4: ab[cd(e]f)g -> true (format overlaps end of cursor)
-            //case 5: ab[cde]f(g) -> false (format after cursor)
-            int formatRangeEnd = formatRange.start + formatRange.length;
+        for(auto &&i: asTextBlocks(cursor)) {
+            for(QTextLayout::FormatRange formatRange: i.block.textFormats()) {
+                // ab[cd]ef
+                //case 1: (a)b[cde]fg -> false (format before cursor)
+                //case 2: a(b[c)de]fg -> true (format overlaps start of cursor
+                //case 3: ab[c(d)e]fg -> true (format completely inside cursor)
+                //case 4: ab[cd(e]f)g -> true (format overlaps end of cursor)
+                //case 5: ab[cde]f(g) -> false (format after cursor)
+                int formatRangeEnd = formatRange.start + formatRange.length;
 
-            if( formatRange.start < (cursor.selectionEnd() - block.position())
-              && formatRangeEnd > (cursor.selectionStart() - block.position())
-) {
-                result.append(formatRange.format);
+                if( formatRange.start < i.end && formatRangeEnd > i.start) {
+                    result.append(formatRange.format);
+                }
             }
         }
         return result;
