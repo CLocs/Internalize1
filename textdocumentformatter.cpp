@@ -13,8 +13,6 @@ namespace {
         int length() { return end - start; }
     };
 
-    class TextBlockIteratorEnd { };
-
     class TextBlockIterator
       : public std::iterator<std::input_iterator_tag,TextBlockInfo>,
         private TextBlockInfo
@@ -28,6 +26,11 @@ namespace {
             end = std::min(docEnd - block.position(),block.length());
         }
     public:
+        TextBlockIterator()
+         : docStart(0)
+         , docEnd(-1)
+        { /* default-constructed iterator is the singleton end() value */ }
+
         TextBlockIterator(const QTextCursor &cursor)
           : docStart(cursor.selectionStart())
           , docEnd(cursor.selectionEnd()) {
@@ -49,18 +52,25 @@ namespace {
         }
         TextBlockInfo &operator *() { return *this; }
         TextBlockInfo *operator ->() { return this; }
-        bool operator==(const TextBlockIterator&other) { return block == other.block; }
-        template<typename T> bool operator !=(T && other) { return !(*this == other); }
-
-        friend bool operator==(const TextBlockIterator &itr, const TextBlockIteratorEnd&) {
-            return !itr.block.isValid() || itr.block.position() >= itr.docEnd;
+        bool operator==(const TextBlockIterator&other) {
+            if(block == other.block) {
+                return true;
+            /* if the one block is not valid, it's an end() sentinel, so see if the other (valid) block has passed the end of its selection */
+            } else if(!other.block.isValid()) {
+                return block.position() >= docEnd;
+            } else if(!block.isValid()) {
+                return other.block.position() >= docEnd;
+            } else {
+                return false;
+            }
         }
+        template<typename T> bool operator !=(T && other) { return !(*this == other); }
     };
 
     struct TextBlockRange {
         TextBlockIterator range;
         TextBlockIterator begin() { return range; }
-        TextBlockIteratorEnd end() {return {}; }
+        TextBlockIterator end() { return {}; }
     };
     TextBlockRange asTextBlocks(const QTextCursor &cursor) { return {cursor}; }
 }
