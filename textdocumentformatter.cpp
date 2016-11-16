@@ -61,7 +61,8 @@ namespace {
         TextBlockIterator range;
         TextBlockIterator begin() { return range; }
         TextBlockIteratorEnd end() {return {}; }
-    } asTextBlocks(const QTextCursor &cursor) { return {cursor}; }
+    };
+    TextBlockRange asTextBlocks(const QTextCursor &cursor) { return {cursor}; }
 }
 
 TextDocumentFormatter::TextDocumentFormatter()
