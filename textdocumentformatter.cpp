@@ -1,6 +1,79 @@
 #include "textdocumentformatter.h"
 #include <QTextCharFormat>
 #include <QTextCursor>
+#include <QTextBlock>
+#include <QTextLayout>
+
+#include <iterator>
+namespace {
+    struct TextBlockInfo {
+        QTextBlock block;
+        int start;
+        int end;
+        int length() { return end - start; }
+    };
+
+    class TextBlockIterator
+      : public std::iterator<std::input_iterator_tag,TextBlockInfo>,
+        private TextBlockInfo
+    {
+        int docStart;
+        int docEnd;
+
+        void init (const QTextBlock &block) {
+            this->block = block;
+            start = std::max(docStart - block.position(), 0);
+            end = std::min(docEnd - block.position(),block.length());
+        }
+    public:
+        TextBlockIterator()
+         : docStart(0)
+         , docEnd(-1)
+        { /* default-constructed iterator is the singleton end() value */ }
+
+        TextBlockIterator(const QTextCursor &cursor)
+          : docStart(cursor.selectionStart())
+          , docEnd(cursor.selectionEnd()) {
+            if(cursor.hasComplexSelection()) {
+                abort(); // table cells and such, ?
+            } else {
+                init(cursor.document()->findBlock(docStart));
+            }
+        }
+
+        TextBlockIterator &operator++() {
+            init(block.next());
+            return *this;
+        }
+        TextBlockIterator operator++(int) {
+            TextBlockIterator r = *this;
+            operator++();
+            return r;
+        }
+        TextBlockInfo &operator *() { return *this; }
+        TextBlockInfo *operator ->() { return this; }
+        bool operator==(const TextBlockIterator&other) {
+            if(block == other.block) {
+                return true;
+            /* if the one block is not valid, it's an end() sentinel, so see if the other (valid) block has passed the end of its selection */
+            } else if(!other.block.isValid()) {
+                return block.position() >= docEnd;
+            } else if(!block.isValid()) {
+                return other.block.position() >= docEnd;
+            } else {
+                return false;
+            }
+        }
+        template<typename T> bool operator !=(T && other) { return !(*this == other); }
+    };
+
+    struct TextBlockRange {
+        TextBlockIterator range;
+        TextBlockIterator begin() { return range; }
+        TextBlockIterator end() { return {}; }
+    };
+    TextBlockRange asTextBlocks(const QTextCursor &cursor) { return {cursor}; }
+}
 
 TextDocumentFormatter::TextDocumentFormatter()
     : m_textDocument(nullptr)
@@ -19,12 +92,87 @@ void TextDocumentFormatter::setTextDocument(QQuickTextDocument *value)
     emit textDocumentChanged();
 }
 
+void TextDocumentFormatter::toggleBold(int start, int end)
+{
+    QTextCursor cursor = makeCursor(start,end);
+
+    bool isAllBold = false;
+    for(const QTextCharFormat &format: charFormats(cursor)) {
+        if(format.fontWeight() > QFont::Normal) {
+            isAllBold = true;
+        } else {
+            isAllBold = false;
+            break; // if *anything* is not bold, the result is "not bold"
+        }
+    }
+    if(isAllBold) {
+        clearBold(start,end);
+    } else {
+        setBold(start,end);
+    }
+}
+
 void TextDocumentFormatter::setBold(int start, int end)
 {
     QTextCharFormat format;
     format.setFontWeight(QFont::Bold);
+    makeCursor(start,end).mergeCharFormat(format);
+}
+
+void TextDocumentFormatter::clearBold(int start, int end)
+{
+    QTextCharFormat format;
+    format.setFontWeight(QFont::Normal);
+    makeCursor(start,end).mergeCharFormat(format);
+}
+
+void TextDocumentFormatter::highlightSelection(int start, int end)
+{
+    QTextCursor cursor = makeCursor(start,end);
+    cursor.beginEditBlock();
+    QTextCharFormat highlightFormat;
+    highlightFormat.setBackground(QColor(Qt::yellow));
+
+    for(auto &&i: asTextBlocks(cursor)) {
+        QTextLayout::FormatRange formatRange;
+        formatRange.format = highlightFormat;
+        formatRange.length = i.length();
+        formatRange.start = i.start;
+        i.block.layout()->setFormats({formatRange});
+    }
+
+    cursor.endEditBlock();
+}
+
+QTextCursor TextDocumentFormatter::makeCursor(int start, int end) const
+{
     QTextCursor cursor(m_textDocument->textDocument());
     cursor.setPosition(start,QTextCursor::MoveAnchor);
     cursor.setPosition(end,QTextCursor::KeepAnchor);
-    cursor.mergeCharFormat(format);
+    return cursor;
+}
+
+QVector<QTextCharFormat> TextDocumentFormatter::charFormats(const QTextCursor &cursor)
+{
+    if(cursor.hasSelection()) {
+        QVector<QTextCharFormat> result;
+        for(auto &&i: asTextBlocks(cursor)) {
+            for(QTextLayout::FormatRange formatRange: i.block.textFormats()) {
+                // ab[cd]ef
+                //case 1: (a)b[cde]fg -> false (format before cursor)
+                //case 2: a(b[c)de]fg -> true (format overlaps start of cursor
+                //case 3: ab[c(d)e]fg -> true (format completely inside cursor)
+                //case 4: ab[cd(e]f)g -> true (format overlaps end of cursor)
+                //case 5: ab[cde]f(g) -> false (format after cursor)
+                int formatRangeEnd = formatRange.start + formatRange.length;
+
+                if( formatRange.start < i.end && formatRangeEnd > i.start) {
+                    result.append(formatRange.format);
+                }
+            }
+        }
+        return result;
+    } else {
+        return { cursor.charFormat() };
+    }
 }

@@ -48,31 +48,38 @@ ApplicationWindow {
 
         WebView {
             id: sourceView
-            width: parent.width / 3
+            width: parent.width / 4
            //url: "https://drive.google.com/open?id=0B3Ej2lncGdJQT1hSY0FVand3aEk"
             // TODO: binding this URL right away shows a blank window - report race condition bug
             Component.onCompleted: sourceView.url = "http://slatestarcodex.com/"
         }
 
         ScrollView {
-            width: parent.width / 3
+            width: parent.width / 4
             Image {
                 source: "Internalize-Demo1.svg"
             }
         }
 
         ListView {
+            width: parent.width / 4
+            id: notesView
             model: NoteDatabase.model
             delegate: Note {
                 title: model.title
                 content: model.content
+                width: notesView.width
 
                 onTitleChanged:  NoteDatabase.model.setTitle(index, title)
-                onContentChanged:  NoteDatabase.model.setContent(index, content)
+                onSave:  {
+                    NoteDatabase.model.setContent(index, content)
+                    Repository.store(content);
+                }
             }
         }
 
         ColumnLayout {
+            width: parent.width / 4
             ListView {
                 Layout.fillHeight: true
                 model: NoteDatabase.model
