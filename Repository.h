@@ -37,6 +37,22 @@ class MultiHash : public QCryptographicHash
     }
 };
 
+class Reference {
+    Q_GADGET
+public:
+    Reference(QByteArray hash) : m_hash(hash) {}
+
+    QByteArray hash() const { return m_hash; }
+
+    Q_INVOKABLE QString toString() const { return hash().toBase64(QByteArray::Base64UrlEncoding); }
+    static Reference fromString(const QString &s) { return QByteArray::fromBase64(s.toUtf8(),QByteArray::Base64UrlEncoding); }
+
+    Q_INVOKABLE QJsonValue toJson() const { return toString(); }
+    static Reference fromJson(const QJsonValue &json) { return fromString(json.toString()); }
+
+    QByteArray m_hash;
+};
+
 class Repository : public QObject
 {
     Q_OBJECT
