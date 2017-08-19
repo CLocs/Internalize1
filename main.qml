@@ -49,9 +49,7 @@ ApplicationWindow {
         WebView {
             id: sourceView
             width: parent.width / 4
-           //url: "https://drive.google.com/open?id=0B3Ej2lncGdJQT1hSY0FVand3aEk"
-            // TODO: binding this URL right away shows a blank window - report race condition bug
-            Component.onCompleted: sourceView.url = "http://slatestarcodex.com/"
+            url: "http://slatestarcodex.com/"
         }
 
         ScrollView {
