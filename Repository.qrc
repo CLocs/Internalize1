@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>repository/DeathOfAHiredMan.txt</file>
+        <file>repository/elon-musk-career-advice.txt</file>
+        <file>repository/on-intelligence.txt</file>
+        <file>repository/sapiens.txt</file>
+        <file>repository/thinking-fast-and-slow.txt</file>
+    </qresource>
+</RCC>

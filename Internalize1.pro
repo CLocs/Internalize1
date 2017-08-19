@@ -7,13 +7,15 @@ SOURCES += main.cpp \
     textdocumentformatter.cpp \
     notedatabase.cpp \
     Repository.cpp \
-    ErrorHandler.cpp
+    ErrorHandler.cpp \
+    TableOfContents.cpp
 
 OTHER_FILES += main.qml \
     MainForm.ui.qml \
     Note.qml
 
-RESOURCES += qml.qrc
+RESOURCES += qml.qrc \
+    Repository.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -25,4 +27,5 @@ HEADERS += \
     textdocumentformatter.h \
     notedatabase.h \
     Repository.h \
-    ErrorHandler.h
+    ErrorHandler.h \
+    TableOfContents.h
