@@ -177,11 +177,20 @@ ApplicationWindow {
 
                         implicitHeight: pageText.implicitHeight + 10
                         implicitWidth: pageText.implicitWidth + 10
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
                                 pageList.currentIndex = index
                             }
+
+                            hoverEnabled: true
+                            ToolTip.delay: 1000
+                            ToolTip.visible: containsMouse && pageText.implicitWidth > pageText.width
+                            ToolTip.text: model.title
                         }
 
                         Text {
@@ -189,6 +198,7 @@ ApplicationWindow {
                             anchors.fill: parent
                             anchors.margins: 4
                             text: model.title
+                            elide: Text.ElideRight
                         }
                     }
                 }
