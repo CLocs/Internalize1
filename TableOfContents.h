@@ -56,6 +56,10 @@ public:
         LinksFrom,
 
         ObjectType = Qt::UserRole,
+
+        // TODO: these need to be kept distinct, how to map them to the Object types above?
+        Content = ObjectTypeRoleBase,
+        URL
     };
 
     TableOfContents(QObject *parent = 0);
@@ -64,8 +68,8 @@ public:
         static const auto roles = QStandardItemModel::roleNames().unite({
                 {Title,"title"},
                 {ObjectType, "objectType"},
-                {WebPage::Roles::URL /* also Image::URL */, "url"},
-                {Note::Roles::Content, "content"}
+                {Content, "content"},
+                {URL, "url"}
             });
         return roles;
     }

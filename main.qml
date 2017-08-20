@@ -45,8 +45,10 @@ ApplicationWindow {
             width: viewportWidth
             // do not bind height, let it work itself from implicitHeight based on word-wrapping
 
-            // TODO: onTitleChanged
-            // TODO: onSave
+            onTitleChanged: tocModel.setData(modelIndex, title, TableOfContents.Title)
+            onContentChanged: tocModel.setData(modelIndex, content, TableOfContents.Content)
+            //TODO: do we still want onSave for expensive serialization?
+            // If so it can't be based on Component.onDestruction, since the component might just get rebound to a new index instead of recreated
         }
     }
 
@@ -119,6 +121,7 @@ ApplicationWindow {
                 Loader {
                     id: currentPage
                     property var model: pageList.currentModel
+                    property var modelIndex: pageList.currentModelIndex
 
                     // inform the component being loaded how large the viewport can be,
                     // in case it wants to wrap itself to fit better
@@ -170,8 +173,16 @@ ApplicationWindow {
                         }
                     }
                 }
+                readonly property var currentModelIndex: {
+                    if(currentIndex >= 0) {
+                        return model.modelIndex(currentIndex)
+                    } else {
+                        return null
+                    }
+                }
+
                 readonly property var currentModel: {
-                    if(currentIndex >= 0 && currentIndex < model.items.count) {
+                    if(currentIndex >= 0) {
                         model.rootIndex; /* just peeking at so QML sees the dependency, DelegateModel doesn't seem to signal the way it impacts model.items.get */
                         return model.items.get(currentIndex).model
                     } else {
