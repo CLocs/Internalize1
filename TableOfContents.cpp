@@ -40,6 +40,12 @@ TableOfContents::TableOfContents(QObject *parent)
     poem->setData(readSourceFile(":/repository/DeathOfAHiredMan.txt"),Note::Roles::Content);
     miscSection->appendRow(poem);
 
+    auto untitled1 = new QStandardItem();
+    untitled1->setData("Untitled 1",TableOfContents::Roles::Title);
+    untitled1->setData(ObjectType::Note,TableOfContents::Roles::ObjectType);
+    untitled1->setData("",Note::Roles::Content);
+    miscSection->appendRow(untitled1);
+
     auto thinkingFastAndSlow = new QStandardItem();
     thinkingFastAndSlow->setData("Thinking Fast and Slow",TableOfContents::Roles::Title);
     thinkingFastAndSlow->setData(ObjectType::Note,TableOfContents::Roles::ObjectType);
