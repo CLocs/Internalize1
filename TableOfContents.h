@@ -5,8 +5,10 @@
 #include <QtQml>
 
 class ObjectType {
+    Q_GADGET
+    Q_ENUMS(ObjectTypeEnum)
 public:
-    enum {
+    enum ObjectTypeEnum{
         Note,
         WebPage,
         Image
@@ -29,7 +31,7 @@ class WebPage {
     Q_ENUMS(Roles)
 public:
     enum Roles {
-        URL = ObjectTypeRoleBase /* QUrl */
+        URL = ObjectTypeRoleBase+1 /* QUrl */
     };
 };
 
@@ -38,7 +40,7 @@ class Image {
     Q_ENUMS(Roles)
 public:
     enum Roles {
-        URL = ObjectTypeRoleBase /* QUrl */
+        URL = ObjectTypeRoleBase+1 /* QUrl */
     };
 };
 
@@ -54,10 +56,19 @@ public:
         LinksFrom,
 
         ObjectType = Qt::UserRole,
-
     };
 
     TableOfContents(QObject *parent = 0);
+
+    QHash<int,QByteArray> roleNames() const override {
+        static const auto roles = QStandardItemModel::roleNames().unite({
+                {Title,"title"},
+                {ObjectType, "objectType"},
+                {WebPage::Roles::URL /* also Image::URL */, "url"},
+                {Note::Roles::Content, "content"}
+            });
+        return roles;
+    }
 
     static QObject *singletontype_provider(QQmlEngine *engine, QJSEngine *scriptEngine);
 };
