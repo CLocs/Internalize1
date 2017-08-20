@@ -22,6 +22,9 @@ ApplicationWindow {
         property int visibility: Window.Windowed
         property alias width: window.width
         property alias height: window.height
+
+        property alias lastSection: sectionList.currentIndex
+        property alias lastPage: pageList.currentIndex
     }
 
     Component.onDestruction: {
@@ -168,8 +171,13 @@ ApplicationWindow {
                     }
                 }
                 readonly property var currentModel: {
-                    model.rootIndex; /* just peeking at so QML sees the dependency, DelegateModel doesn't seem to signal the way it impacts model.items.get */
-                    model.items.get(currentIndex).model }
+                    if(currentIndex >= 0 && currentIndex < model.items.count) {
+                        model.rootIndex; /* just peeking at so QML sees the dependency, DelegateModel doesn't seem to signal the way it impacts model.items.get */
+                        return model.items.get(currentIndex).model
+                    } else {
+                        return null;
+                    }
+                }
             }
         }
     }
