@@ -76,6 +76,7 @@ ApplicationWindow {
 
     ColumnLayout {
         anchors.fill: parent
+        spacing: 0
 
         ListView {
             id: sectionList
@@ -88,10 +89,10 @@ ApplicationWindow {
                 id: sectionListDelegate
                 Rectangle {
                     border.color: "gray"
-                    border.width: 1
+                    // TODO: should really do this on the bottom border only
+                    border.width: ListView.isCurrentItem ? 0 : 1
 
-                    color: ListView.isCurrentItem ? "lightblue" : "white"
-
+                    color: model.sectionColor
                     implicitHeight: sectionText.implicitHeight + 10
                     implicitWidth: sectionText.implicitWidth + 10
                     MouseArea {
@@ -129,6 +130,20 @@ ApplicationWindow {
                     return null
                 }
             }
+
+            readonly property var currentModel: {
+                if(currentIndex >= 0) {
+                    model.rootIndex; /* just peeking at so QML sees the dependency, DelegateModel doesn't seem to signal the way it impacts model.items.get */
+                    return model.items.get(currentIndex).model
+                } else {
+                    return null;
+                }
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 5
+            color: sectionList.currentModel.sectionColor
         }
 
         Controls1.SplitView {
@@ -163,9 +178,16 @@ ApplicationWindow {
                 }
             }
 
+
             ListView {
                 id: pageList
                 clip: true
+
+                Rectangle {
+                    anchors.fill: pageList
+                    color: sectionList.currentModel.sectionColor
+                    z: -1
+                }
 
                 Component {
                     id: pageListDelegate
@@ -173,7 +195,7 @@ ApplicationWindow {
                         border.color: "gray"
                         border.width: 1
 
-                        color: ListView.isCurrentItem ? "lightblue" : "white"
+                        color: ListView.isCurrentItem ? "white" : "transparent"
 
                         implicitHeight: pageText.implicitHeight + 10
                         implicitWidth: pageText.implicitWidth + 10

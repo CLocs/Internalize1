@@ -52,10 +52,11 @@ class TableOfContents : public QStandardItemModel
 public:
     enum Roles {
         Title = Qt::DisplayRole, /* QString */
-        LinksTo,
-        LinksFrom,
+        SectionColor = Qt::BackgroundColorRole,
 
         ObjectType = Qt::UserRole,
+        LinksTo,
+        LinksFrom,
 
         // TODO: these need to be kept distinct, how to map them to the Object types above?
         Content = ObjectTypeRoleBase,
@@ -67,6 +68,7 @@ public:
     QHash<int,QByteArray> roleNames() const override {
         static const auto roles = QStandardItemModel::roleNames().unite({
                 {Title,"title"},
+                {SectionColor,"sectionColor"},
                 {ObjectType, "objectType"},
                 {Content, "content"},
                 {URL, "url"}

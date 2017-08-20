@@ -11,15 +11,32 @@ namespace {
             return QString();
         }
     }
+
+
+
+    QColor randomColor(int i) {
+        //https://en.wikipedia.org/wiki/Golden_angle
+        const double goldenRatio = 1.6180339887498948482;
+        const double goldenAngle = 1/(1+goldenRatio);
+        return QColor::fromHslF(fmod(i/goldenRatio,1), 1, 0.85);
+    }
 }
 
 TableOfContents::TableOfContents(QObject *parent)
     : QStandardItemModel(parent)
 {
     auto miscSection = new QStandardItem("Misc");
+    miscSection->setData(randomColor(1),SectionColor);
     auto mindMachinery = new QStandardItem("Mind Machinery");
+    mindMachinery->setData(randomColor(2),SectionColor);
     appendRow(miscSection);
     appendRow(mindMachinery);
+
+    for(int i = 3; i < 6; ++i) {
+        auto more = new QStandardItem(QString("Section %1").arg(i));
+        more->setData(randomColor(i),SectionColor);
+        appendRow(more);
+    }
 
     auto slateStarCodex = new QStandardItem();
     slateStarCodex->setData("Slate Star Codex",TableOfContents::Roles::Title);
