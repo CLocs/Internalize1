@@ -37,7 +37,7 @@ TableOfContents::TableOfContents(QObject *parent)
     auto poem = new QStandardItem();
     poem->setData("Death of a Hired Man",TableOfContents::Roles::Title);
     poem->setData(ObjectType::Note,TableOfContents::Roles::ObjectType);
-    poem->setData(readSourceFile(":/repository/DeathOfAHiredMap.txt"),Note::Roles::Content);
+    poem->setData(readSourceFile(":/repository/DeathOfAHiredMan.txt"),Note::Roles::Content);
     miscSection->appendRow(poem);
 
     auto thinkingFastAndSlow = new QStandardItem();
