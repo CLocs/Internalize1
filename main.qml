@@ -36,11 +36,14 @@ ApplicationWindow {
 
     Component {
         id: noteComponent
-        Text {
-            text : model.content
+        Note {
+            title: model.title
+            content : model.content
             width: viewportWidth
             // do not bind height, let it work itself from implicitHeight based on word-wrapping
-            wrapMode: Text.WordWrap
+
+            // TODO: onTitleChanged
+            // TODO: onSave
         }
     }
 
