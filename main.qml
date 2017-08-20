@@ -80,30 +80,53 @@ ApplicationWindow {
         ListView {
             id: sectionList
             Layout.fillWidth: true
-            height: 50
+            implicitHeight: sectionPlaceholder.implicitHeight
+
             orientation: Qt.Horizontal
-            model: tocModel
 
-            delegate: Rectangle {
-                border.color: "gray"
-                border.width: 1
+            Component {
+                id: sectionListDelegate
+                Rectangle {
+                    border.color: "gray"
+                    border.width: 1
 
-                color: ListView.isCurrentItem ? "lightblue" : "white"
+                    color: ListView.isCurrentItem ? "lightblue" : "white"
 
-                implicitHeight: sectionText.implicitHeight + 10
-                implicitWidth: sectionText.implicitWidth + 10
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        sectionList.currentIndex = index
+                    implicitHeight: sectionText.implicitHeight + 10
+                    implicitWidth: sectionText.implicitWidth + 10
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            sectionList.currentIndex = index
+                        }
+                    }
+
+                    Text {
+                        id: sectionText
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        text: model.title
                     }
                 }
+            }
 
-                Text {
-                    id: sectionText
-                    anchors.fill: parent
-                    anchors.margins: 4
-                    text: display
+            model: DelegateModel {
+                model: tocModel
+                delegate: sectionListDelegate
+            }
+
+            Loader { // load the delegate with dummy data to get a sizeHint
+                id: sectionPlaceholder
+                property var model: { return { "title": "Placeholder"}; }
+                sourceComponent: sectionListDelegate
+                visible: false
+            }
+
+            readonly property var currentModelIndex: {
+                if(currentIndex >= 0) {
+                    return model.modelIndex(currentIndex)
+                } else {
+                    return null
                 }
             }
         }
@@ -144,20 +167,16 @@ ApplicationWindow {
                 id: pageList
                 clip: true
 
-                Layout.minimumWidth: 100
-                Layout.fillHeight: true
-                model: DelegateModel {
-                    model: tocModel
-                    rootIndex: tocModel.index(sectionList.currentIndex,0)
-
-                    delegate: Rectangle {
+                Component {
+                    id: pageListDelegate
+                    Rectangle {
                         border.color: "gray"
                         border.width: 1
 
                         color: ListView.isCurrentItem ? "lightblue" : "white"
 
-                        implicitHeight: sectionText.implicitHeight + 10
-                        implicitWidth: sectionText.implicitWidth + 10
+                        implicitHeight: pageText.implicitHeight + 10
+                        implicitWidth: pageText.implicitWidth + 10
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
@@ -166,13 +185,23 @@ ApplicationWindow {
                         }
 
                         Text {
-                            id: sectionText
+                            id: pageText
                             anchors.fill: parent
                             anchors.margins: 4
-                            text: model.display
+                            text: model.title
                         }
                     }
                 }
+
+
+                Layout.minimumWidth: 100
+                Layout.fillHeight: true
+                model: DelegateModel {
+                    model: tocModel
+                    rootIndex: sectionList.currentModelIndex
+                    delegate: pageListDelegate
+                }
+
                 readonly property var currentModelIndex: {
                     if(currentIndex >= 0) {
                         return model.modelIndex(currentIndex)
