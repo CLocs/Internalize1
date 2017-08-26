@@ -23,8 +23,8 @@ ApplicationWindow {
         property alias width: window.width
         property alias height: window.height
 
-        property alias lastSection: sectionList.currentIndex
-        property alias lastPage: pageList.currentIndex
+        property alias currentSection: sectionList.currentIndex
+        property alias currentPage: pageList.currentIndex
     }
 
     Component.onDestruction: {
@@ -118,7 +118,7 @@ ApplicationWindow {
 
             Loader { // load the delegate with dummy data to get a sizeHint
                 id: sectionPlaceholder
-                property var model: { return { "title": "Placeholder"}; }
+                property var model: { return { "title": "Placeholder",  "sectionColor": "white"}; }
                 sourceComponent: sectionListDelegate
                 visible: false
             }
