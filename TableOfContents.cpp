@@ -106,7 +106,7 @@ TableOfContents::TableOfContents(QObject *parent)
     auto skills_vs_talents = new QStandardItem();
     skills_vs_talents->setData("Skills vs Talents",TableOfContents::Roles::Title);
     skills_vs_talents->setData(ObjectType::Note,TableOfContents::Roles::ObjectType);
-    skills_vs_talents->setData(readSourceFile(":/repository/personality_myth.txt"),Note::Roles::Content);
+    skills_vs_talents->setData(readSourceFile(":/repository/skills_vs_talents.txt"),Note::Roles::Content);
     mindMachinery->appendRow(skills_vs_talents);
 
     auto slowing_down = new QStandardItem();
