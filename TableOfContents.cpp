@@ -1,18 +1,21 @@
 #include "TableOfContents.h"
 
 #include <QFile>
+#include <QTextDocument>
 
 namespace {
     QString readSourceFile(QString filename) {
         QFile file(filename);
         if(file.open(QIODevice::ReadOnly)) {
-            return QString::fromUtf8(file.readAll());
+            QString content = QString::fromUtf8(file.readAll());
+            if(!Qt::mightBeRichText(content)) {
+                content = Qt::convertFromPlainText(content);
+            }
+            return content;
         } else {
             return QString();
         }
     }
-
-
 
     QColor randomColor(int i) {
         //https://en.wikipedia.org/wiki/Golden_angle
