@@ -5,7 +5,6 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 import QtQml.Models 2.2
-import QtWebView 1.1
 import colin.das.Internalize 1.0
 import Qt.labs.settings 1.0
 
@@ -36,43 +35,6 @@ ApplicationWindow {
     }
 
     property var tocModel: TableOfContents
-
-    Component {
-        id: noteComponent
-        Note {
-            title: model.title
-            content : model.content
-            width: viewportWidth
-            // do not bind height, let it work itself from implicitHeight based on word-wrapping
-
-            onTitleChanged: tocModel.setData(modelIndex, title, TableOfContents.Title)
-            onContentChanged: tocModel.setData(modelIndex, content, TableOfContents.Content)
-            //TODO: do we still want onSave for expensive serialization?
-            // If so it can't be based on Component.onDestruction, since the component might just get rebound to a new index instead of recreated
-        }
-    }
-
-    Component {
-        id: webComponent
-        WebView {
-            width: viewportWidth
-            height: viewportHeight
-            url: model.url
-        }
-    }
-
-    Component {
-        id: imageComponent
-        Image {
-            source: model.url
-            fillMode: Image.Pad
-        }
-    }
-
-    Component {
-        id: busyComponent
-        BusyIndicator { }
-    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -156,25 +118,15 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 clip: true
-                Loader {
-                    id: currentPage
-                    property var model: pageList.currentModel
-                    property var modelIndex: pageList.currentModelIndex
+
+                ObjectDelegate {
+                    model: pageList.currentModel
+                    modelIndex: pageList.currentModelIndex
 
                     // inform the component being loaded how large the viewport can be,
                     // in case it wants to wrap itself to fit better
-                    property int viewportWidth: pageScroll.width
-                    property int viewportHeight: pageScroll.height
-
-                    sourceComponent: {
-                        if(model) switch(model.objectType) {
-                        case ObjectType.Note: return noteComponent;
-                        case ObjectType.WebPage: return webComponent;
-                        case ObjectType.Image: return imageComponent;
-                        }
-                        return busyComponent
-                    }
-                    active:true
+                    viewportWidth: pageScroll.width
+                    viewportHeight: pageScroll.height
                 }
             }
 

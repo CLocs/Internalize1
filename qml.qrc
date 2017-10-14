@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>Note.qml</file>
         <file>Internalize-Demo1.svg</file>
+        <file>ObjectDelegate.qml</file>
     </qresource>
 </RCC>

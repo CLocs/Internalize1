@@ -12,6 +12,7 @@ SOURCES += main.cpp \
 
 OTHER_FILES += main.qml \
     Note.qml
+    ObjectDelegate.qml
 
 RESOURCES += qml.qrc \
     Repository.qrc
