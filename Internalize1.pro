@@ -11,7 +11,6 @@ SOURCES += main.cpp \
     TableOfContents.cpp
 
 OTHER_FILES += main.qml \
-    MainForm.ui.qml \
     Note.qml
 
 RESOURCES += qml.qrc \
